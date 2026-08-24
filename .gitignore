@@ -1,0 +1,7 @@
+Project-Handbook-T1_2026-2027_P_FUN_P_OO/
+
+# Fichiers Word de sauvegarde et temporaires
+*.bak
+~$*.docx
+*.tmp
+*.docx
