@@ -41,6 +41,12 @@ Tableau des User Stories :
 |  #5  | Importation de fichiers de données | Je veux pouvoir importer des fichiers de données au format CSV ou JSON ou via une API (json) | Afin d'intégrer de nouvelles données météo a mon application |
 |  #6  | Consultation en mode hors ligne | Je veux pouvoir visualiser les graphiques de l'historique météo des 5 villes turques (Istanbul, Ankara, Gaziantep, Kahramanmaraş et Antalya) sans connexion réseau| Afin de pouvoir analyser et comparer les graphiques sans connexion Internet |
 
+#### Voici la maquette
+
+![maquette](./maquette.png)
+
+Nous retrouvons un simplte graphique avec des données (courbes), fictives. Et a droite il y'a les actoins que nous pouons réaliser, importer ou exporter les données, et afficher chaque serie, etc.
+
 ## 3. Planification initiale	
 
 Tableau de planification :
