@@ -11,3 +11,8 @@ setup_imgui.sh
 ~$*.docx
 *.tmp
 *.docx
+
+.DS_Store
+~$Jdt-P_FUN.xlsx
+Jdt-P_FUN.xlsx
+P_FUN-Specifications.pdf
