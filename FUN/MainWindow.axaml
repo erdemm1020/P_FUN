@@ -1,0 +1,31 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:ScottPlot="clr-namespace:ScottPlot.Avalonia;assembly=ScottPlot.Avalonia"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="FUN.MainWindow"
+        Title="FUN">
+    <Grid ColumnDefinitions="220, *">
+        <!-- Menu latéral -->
+        <StackPanel Grid.Column="0" Background="#1e1e2e" Margin="0" Spacing="12">
+            <TextBlock Text="Menu aa" Foreground="#cdd6f4" FontSize="16" FontWeight="Bold" Margin="12,16,12,0"/>
+            
+            <!-- Checkboxes -->
+            <CheckBox Content="aaaa" Foreground="#cdd6f4" Margin="12,0"/>
+            <CheckBox Content="aaab" Foreground="#cdd6f4" Margin="12,0"/>
+            <CheckBox Content="dasdasd" Foreground="#cdd6f4" Margin="12,0"/>
+            
+            <!-- separator a droite -->
+            <Border Height="1" Background="#313244" Margin="12,8"/>
+            
+            <!-- bouton dans le menu -->
+            <Button Content="Boutoon1" HorizontalAlignment="Stretch" Margin="12,0"/>
+            <Button Content="Bouton 2" HorizontalAlignment="Stretch" Margin="12,0"/>
+            <Button Content="Bouton 3" HorizontalAlignment="Stretch" Margin="12,0"/>
+        </StackPanel>
+
+        <!-- zone a droite avec le graphique  -->
+        <ScottPlot:AvaPlot x:Name="MyPlot" Grid.Column="1" />
+    </Grid>
+</Window>

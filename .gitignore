@@ -14,5 +14,8 @@ setup_imgui.sh
 
 .DS_Store
 ~$Jdt-P_FUN.xlsx
-Jdt-P_FUN.xlsx
 P_FUN-Specifications.pdf
+
+
+Fun/bin
+Fun/obj
