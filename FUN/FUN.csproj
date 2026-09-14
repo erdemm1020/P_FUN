@@ -4,6 +4,7 @@
         <TargetFramework>net8.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ApplicationManifest>app.manifest</ApplicationManifest>
+        <DefaultItemExcludes>$(DefaultItemExcludes);DataSeries\bin\**;DataSeries\obj\**</DefaultItemExcludes>
     </PropertyGroup>
 
     <ItemGroup>
@@ -18,4 +19,14 @@
         <PackageReference Include="ScottPlot.Avalonia" Version="5.1.59" />
         <PackageReference Include="Sesame.ScottPlot.Avalonia" Version="5.1.58" />
     </ItemGroup>
+
+    <ItemGroup>
+      <Compile Remove="Programa.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+  <None Include="weather_data.csv">
+    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+  </None>
+</ItemGroup>
 </Project>
