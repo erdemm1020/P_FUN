@@ -20,7 +20,19 @@ P_FUN-Specifications.pdf
 Fun/bin
 Fun/obj
 
-FUN/DataSeries/obj/
-FUN/DataSeries/bin/
+FUN/DataSeries/obj
+FUN/DataSeries/bin
 
 FUN/Programa.cs
+
+# .NET Build Outputs
+[Bb]in/
+[Oo]bj/
+*.user
+*.userosscache
+*.sln.docstates
+
+# IDE / Rider
+.idea/
+*.suo
+*.user
