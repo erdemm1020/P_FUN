@@ -1,4 +1,8 @@
+using System;
+using System.Linq;
 using Avalonia.Controls;
+using Avalonia.Interactivity;
+using DataSeries;
 using ScottPlot;
 
 namespace FUN;
@@ -8,36 +12,19 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
-        
-        // Donnés fictives 
-        double[] dataX = [1, 2, 3, 4, 5];
-        double[] dataY = [1, 4, 9, 16, 25];
 
-        MyPlot.Plot.Add.Scatter(dataX, dataY);
-        
-        MyPlot.Plot.Title("graphique x");
-        MyPlot.Plot.XLabel("Axe X");
-        MyPlot.Plot.YLabel("Axe Y");
+        var series = DataSeries<DataPoint<Weather>>.FromCsv("weather_data.csv", Parser.ParseWeather);
+        Console.WriteLine($"Nombre d'éléments : {series.Count}");
 
-        IXAxis xAxis = MyPlot.Plot.Axes.Bottom;
-        IYAxis yAxis = MyPlot.Plot.Axes.Left;
-        
-        // Limiter le zoom
-        MyPlot.Plot.Axes.Rules.Add(new ScottPlot.AxisRules.MinimumSpan(
-            xAxis: xAxis,
-            yAxis: yAxis,
-            xSpan: 1.0,  
-            ySpan: 1.0
-        ));
+        double[] dates = series.Select(dp => dp.Timestamp.ToOADate()).ToArray();
+        double[] temps = series.Select(dp => dp.Value.Temperature).ToArray();
 
-        // Limiter le zoom
-        AxisLimits limits = new(-5, 10, -5, 30);
-        MyPlot.Plot.Axes.Rules.Add(new ScottPlot.AxisRules.MaximumBoundary(
-            xAxis: xAxis,
-            yAxis: yAxis,
-            limits: limits
-        ));
+        var scatter = MyPlot.Plot.Add.Scatter(dates, temps);
+        scatter.Label = "Temperature";
+        scatter.Color = ScottPlot.Color.FromHex("#0284C7");
 
+        MyPlot.Plot.Axes.DateTimeTicksBottom();
         MyPlot.Refresh();
     }
+
 }
