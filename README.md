@@ -1,4 +1,23 @@
-# PROJET P_FUN - PLOT THOSE LINES !
+
+# Lancer le projet
+
+Pour démarrer l'application, assurez-vous d'avoir installé [.NET SDK](https://dotnet.microsoft.com/) sur votre machine, puis suivez les étapes ci-dessous :
+
+1. Ouvrez votre terminal.
+2. Naviguez vers le dossier contenant le projet (le dossier 'FUN') :
+```bash
+cd FUN
+
+```
+
+
+3. Lancez l'application à l'aide de la commande 'dotnet' :
+```bash
+dotnet run
+
+```
+
+# Rapport - PROJET P_FUN - PLOT THOSE LINES !
 
 **Auteur :** Ökkes Erdem Köse  
 **Classe :** CID2B  
