@@ -11,7 +11,7 @@ namespace DataSeries
 
         private DataSerie(IEnumerable<T> data) => _data = data;
 
-        private static DataSerie<T> From(IEnumerable<T> source)
+        public static DataSerie<T> From(IEnumerable<T> source)
         {
             return new DataSerie<T>(source);
         }

@@ -16,7 +16,12 @@
             
             <!-- separator a droite -->
             <Border Height="1" Background="#313244" Margin="12,8"/>
+            <!-- Boutons d'import -->
+            <Button Content="Importer Fichier (CSV/JSON)" HorizontalAlignment="Stretch" Margin="12,0" Click="ImportFile_Click"/>
+
             
+            <Border Height="1" Background="#313244" Margin="12,8"/>
+
             <!-- bouton dans le menu -->
             <StackPanel Orientation="Horizontal" Margin="12,0" Spacing="8">
                 <ComboBox x:Name="ExportFormatComboBox" SelectedIndex="0">
