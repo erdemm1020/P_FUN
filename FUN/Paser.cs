@@ -6,7 +6,7 @@ namespace DataSeries;
 
 public class Parser
 {
-    public static DataPoint<Weather> ParseWeather(string[] cols)
+    public static Weather ParseWeather(string[] cols)
     {
         if (cols == null || cols.Length < 3)
         {
@@ -20,7 +20,6 @@ public class Parser
             ? double.Parse(cols[3], CultureInfo.InvariantCulture)
             : 0;
 
-        Weather weather = new(date, cityName, temperature, degres);
-        return new DataPoint<Weather>(date, weather);
+        return new Weather(date, cityName, temperature, degres);
     }
 }

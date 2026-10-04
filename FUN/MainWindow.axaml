@@ -2,7 +2,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:ScottPlot="clr-namespace:ScottPlot.Avalonia;assembly=ScottPlot.Avalonia"
+        xmlns:sp="clr-namespace:ScottPlot.Avalonia;assembly=ScottPlot.Avalonia"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="FUN.MainWindow"
         Title="FUN">
@@ -18,12 +18,16 @@
             <Border Height="1" Background="#313244" Margin="12,8"/>
             
             <!-- bouton dans le menu -->
-            <Button Content="Boutoon1" HorizontalAlignment="Stretch" Margin="12,0"/>
-            <Button Content="Bouton 2" HorizontalAlignment="Stretch" Margin="12,0"/>
-            <Button Content="Bouton 3" HorizontalAlignment="Stretch" Margin="12,0"/>
+            <StackPanel Orientation="Horizontal" Margin="12,0" Spacing="8">
+                <ComboBox x:Name="ExportFormatComboBox" SelectedIndex="0">
+                    <ComboBoxItem>PNG</ComboBoxItem>
+                    <ComboBoxItem>CSV</ComboBoxItem>
+                </ComboBox>
+                <Button Content="Exporter" Click="ExportButton_Click"/>
+            </StackPanel>
         </StackPanel>
 
         <!-- zone a droite avec le graphique  -->
-        <ScottPlot:AvaPlot x:Name="MyPlot" Grid.Column="1" />
+        <sp:AvaPlot x:Name="MyPlot" Grid.Column="1" />
     </Grid>
 </Window>

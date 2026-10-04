@@ -1,56 +1,46 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
 namespace DataSeries
 {
-    public class DataSeries<T> : IEnumerable<T>
+    public class DataSerie<T>
     {
-        private readonly IReadOnlyList<T> _data;
+        private readonly IEnumerable<T> _data;
 
-        private DataSeries(IEnumerable<T> data) 
+        private DataSerie(IEnumerable<T> data) => _data = data;
+
+        private static DataSerie<T> From(IEnumerable<T> source)
         {
-            _data = data.ToList().AsReadOnly();
+            return new DataSerie<T>(source);
         }
 
-        public static DataSeries<T> From(IEnumerable<T> source)
-            => new DataSeries<T>(source);
-
-        public static DataSeries<T> FromCsv(string path, Func<string[], T> parser)
+        public static DataSerie<T> FromCsv(string filename, Func<string[], T> parser)
         {
-            if (!File.Exists(path))
-            {
-                throw new FileNotFoundException($"Le fichier CSV est introuvable : {path}");
-            }
-
             List<T> data = new List<T>();
-
             try
             {
-                foreach (string line in File.ReadLines(path).Skip(1))
+                List<string> content = File.ReadAllLines(filename).ToList();
+                foreach (string line in content.Skip(1))
                 {
-                    if (string.IsNullOrWhiteSpace(line)) 
-                        continue; 
-
                     string[] cols = line.Split(',');
                     data.Add(parser(cols));
                 }
-            }
-            catch (Exception e)
+            } 
+            catch (Exception e) 
             {
-                Console.WriteLine($"Erreur lors de la lecture du fichier : {e.Message}");
-                throw;
+                Console.WriteLine($"Erreur d'ouverture du fichier {e.Message}");
             }
-
             return From(data);
         }
+        
+        public int Count => _data.Count();
+        public IEnumerable<T> Values => _data;
 
-        public int Count => _data.Count;
-        public IReadOnlyList<T> Values => _data;
-
-        public IEnumerator<T> GetEnumerator() => _data.GetEnumerator();
-        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+        public override string ToString()
+        {
+            return $"DataSerie<{typeof(T).Name}>: {Count} elements: {Environment.NewLine}{String.Join(Environment.NewLine, _data.Select(s => s).ToArray())}";
+        }
     }
 }
