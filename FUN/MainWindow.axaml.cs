@@ -162,21 +162,25 @@ public partial class MainWindow : Window
         if (ExportFormatComboBox.SelectedItem is not ComboBoxItem { Content: string format }) return;
 
         string basePath = AppDomain.CurrentDomain.BaseDirectory;
+        string exportsDir = Path.Combine(basePath, "ExportedFiles");
+        Directory.CreateDirectory(exportsDir);
+
+        string timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
 
         switch (format)
         {
             case "PNG":
-                string pngPath = Path.Combine(basePath, "graphique_export.png");
+                string pngPath = Path.Combine(exportsDir, $"{timestamp}_graphique_export.png");
                 MyPlot.Plot.SavePng(pngPath, 800, 600);
                 Console.WriteLine($"Export PNG : {pngPath}");
                 break;
 
             case "CSV":
-                string csvPath = Path.Combine(basePath, "donnees_export.csv");
+                string csvPath = Path.Combine(exportsDir, $"{timestamp}_donnees_export.csv");
                 var csvLines = _series.Values
                     .Select(w => $"{w.DateData:yyyy-MM-dd HH:mm:ss},{w.CityName},{w.Temperature.ToString(CultureInfo.InvariantCulture)},{w.Degres.ToString(CultureInfo.InvariantCulture)}")
                     .Prepend("Date,Ville,Temperature,Degres");
-                
+
                 File.WriteAllLines(csvPath, csvLines);
                 Console.WriteLine($"Export CSV : {csvPath}");
                 break;
