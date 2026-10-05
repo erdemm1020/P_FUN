@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Text.Json;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
@@ -20,8 +19,37 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
+        
+        var allData = new List<Weather>();
 
-        _series = DataSerie<Weather>.FromCsv("weather_data.csv", Parser.ParseWeather);
+        string importsDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "FichierIMport");
+        if (Directory.Exists(importsDir))
+        {
+            foreach (var file in Directory.GetFiles(importsDir))
+            {
+                try
+                {
+                    var parsed = Path.GetExtension(file).ToLowerInvariant() switch
+                    {
+                        ".csv" => DataSerie<Weather>.FromCsv(file, Parser.ParseWeather).Values,
+                        _ => Enumerable.Empty<Weather>()
+                    };
+                    allData.AddRange(parsed);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Erreur de chargement ({file}) : {ex.Message}");
+                }
+            }
+        }
+
+        var combinedValues = allData
+            .GroupBy(w => new { w.DateData, w.CityName })
+            .Select(g => g.First())
+            .OrderBy(w => w.DateData);
+
+        _series = DataSerie<Weather>.From(combinedValues);
+        
         Console.WriteLine($"Nombre d'éléments : {_series.Count}");
         
         RefreshPlot();
@@ -77,42 +105,55 @@ public partial class MainWindow : Window
 
         var files = await topLevel.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
         {
-            Title = "Sélectionner un fichier de données",
+            Title = "Selectionner un fichier",
             AllowMultiple = true
         });
 
         if (files is not { Count: > 0 }) return; 
 
-        var newWeathers = files
-            .Select(f => f.Path.LocalPath)
-            .Where(path => !string.IsNullOrEmpty(path))
-            .SelectMany(path => path!.ToLowerInvariant() switch
+        string importsDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "FichierIMport");
+        Directory.CreateDirectory(importsDir);
+
+        var allNewWeathers = new List<Weather>();
+
+        foreach (var file in files)
+        {
+            try
             {
-                var p when p.EndsWith(".csv") => DataSerie<Weather>.FromCsv(path, Parser.ParseWeather).Values,
-                var p when p.EndsWith(".json") => ParseJsonWeathers(path),
-                _ => Enumerable.Empty<Weather>()
-            })
-            .ToList();
+                string sourcePath = file.Path.LocalPath;
+                if (string.IsNullOrEmpty(sourcePath) || !File.Exists(sourcePath)) continue;
 
-        if (newWeathers.Any())
+                string timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
+                string destPath = Path.Combine(importsDir, $"{timestamp}_{Path.GetFileName(sourcePath)}");
+
+                File.Copy(sourcePath, destPath, true);
+                Console.WriteLine($"Fichier copiee : {destPath}");
+
+                var parsedWeathers = Path.GetExtension(destPath).ToLowerInvariant() switch
+                {
+                    ".csv" => DataSerie<Weather>.FromCsv(destPath, Parser.ParseWeather).Values,
+                    _ => Enumerable.Empty<Weather>()
+                };
+
+                allNewWeathers.AddRange(parsedWeathers);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Erreur ({file.Name}) : {ex.Message}");
+            }
+        }
+
+        if (allNewWeathers.Any())
         {
-            _series = DataSerie<Weather>.From(_series.Values.Concat(newWeathers));
+            var combinedValues = _series.Values
+                .Concat(allNewWeathers)
+                .GroupBy(w => new { w.DateData, w.CityName })
+                .Select(g => g.First())
+                .OrderBy(w => w.DateData);
+
+            _series = DataSerie<Weather>.From(combinedValues);
             RefreshPlot();
-        }
-    }
-
-    private static IEnumerable<Weather> ParseJsonWeathers(string path)
-    {
-        try
-        {
-            string json = File.ReadAllText(path);
-            var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-            return JsonSerializer.Deserialize<List<Weather>>(json, options) ?? Enumerable.Empty<Weather>();
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Erreur JSON ({path}): {ex.Message}");
-            return Enumerable.Empty<Weather>();
+            Console.WriteLine($"Importatoion terminée. Total : {_series.Count}");
         }
     }
 
@@ -127,7 +168,7 @@ public partial class MainWindow : Window
             case "PNG":
                 string pngPath = Path.Combine(basePath, "graphique_export.png");
                 MyPlot.Plot.SavePng(pngPath, 800, 600);
-                Console.WriteLine($"Graphique exporté en PNG vers : {pngPath}");
+                Console.WriteLine($"Export PNG : {pngPath}");
                 break;
 
             case "CSV":
@@ -137,7 +178,7 @@ public partial class MainWindow : Window
                     .Prepend("Date,Ville,Temperature,Degres");
                 
                 File.WriteAllLines(csvPath, csvLines);
-                Console.WriteLine($"Données exportées en CSV vers : {csvPath}");
+                Console.WriteLine($"Export CSV : {csvPath}");
                 break;
         }
     }

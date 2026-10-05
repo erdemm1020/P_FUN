@@ -41,7 +41,7 @@
 			<!-- separator a droite -->
 			<Border Height="1" Background="#313244" Margin="12,8"/>
 			<!-- Boutons d'import -->
-			<Button Content="Importer Fichier (CSV/JSON)" HorizontalAlignment="Stretch" Margin="12,0" Click="ImportFile_Click"/>
+			<Button Content="Importer Fichier (CSV)" HorizontalAlignment="Stretch" Margin="12,0" Click="ImportFile_Click"/>
 
 
 			<Border Height="1" Background="#313244" Margin="12,8"/>

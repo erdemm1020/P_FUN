@@ -24,9 +24,4 @@
       <Compile Remove="Programa.cs" />
   </ItemGroup>
 
-  <ItemGroup>
-  <None Include="weather_data.csv">
-    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-  </None>
-</ItemGroup>
 </Project>
