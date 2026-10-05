@@ -25,15 +25,18 @@ public partial class MainWindow : Window
         string importsDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "FichierIMport");
         if (Directory.Exists(importsDir))
         {
+            // parcours de chaque fichier qui se trouve dans le dossier import
             foreach (var file in Directory.GetFiles(importsDir))
             {
                 try
                 {
+                    // détermination du parser en fonction de l'extension 
                     var parsed = Path.GetExtension(file).ToLowerInvariant() switch
                     {
                         ".csv" => DataSerie<Weather>.FromCsv(file, Parser.ParseWeather).Values,
                         _ => Enumerable.Empty<Weather>()
                     };
+                    // ajout des données dans la liste 
                     allData.AddRange(parsed);
                 }
                 catch (Exception ex)
@@ -43,25 +46,33 @@ public partial class MainWindow : Window
             }
         }
 
+        // tri des données pour enelver les doublons
         var combinedValues = allData
             .GroupBy(w => new { w.DateData, w.CityName })
             .Select(g => g.First())
             .OrderBy(w => w.DateData);
 
+        // céraition de la serie de données à partir des valeurs sans doublons
         _series = DataSerie<Weather>.From(combinedValues);
         
         Console.WriteLine($"Nombre d'éléments : {_series.Count}");
         
         RefreshPlot();
 
+        // interaction dans le graphiuqe
         MyPlot.IsHitTestVisible = true; 
     }
 
+    /// <summary>
+    /// mets a jour tout le graphique et re créé les checkboxes pour chaque villes
+    /// </summary>
     private void RefreshPlot()
     {
+        // nettoyage de l'ancien affichage
         MyPlot.Plot.Clear();
         CityCheckBoxContainer.Children.Clear();
 
+        // regroupement des données par villes
         var cityPlotsData = _series.Values
             .GroupBy(dp => dp.CityName)
             .Select(group => (
@@ -70,6 +81,7 @@ public partial class MainWindow : Window
                 Temps: group.Select(dp => dp.Temperature).ToArray()
             ));
 
+        // génération des courbes et de leurs checkBoxes
         var checkBoxes = cityPlotsData.Select(data =>
         {
             var scatter = MyPlot.Plot.Add.Scatter(data.Dates, data.Temps);
@@ -83,6 +95,7 @@ public partial class MainWindow : Window
                 Margin = new Thickness(12, 0)
             };
 
+            //
             checkBox.IsCheckedChanged += (_, _) => 
             {
                 scatter.IsVisible = checkBox.IsChecked == true;
