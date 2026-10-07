@@ -63,6 +63,8 @@ public partial class MainWindow : Window
         MyPlot.IsHitTestVisible = true; 
     }
 
+
+
     /// <summary>
     /// mets a jour tout le graphique et re créé les checkboxes pour chaque villes
     /// </summary>
@@ -198,5 +200,9 @@ public partial class MainWindow : Window
                 Console.WriteLine($"Export CSV : {csvPath}");
                 break;
         }
+    }
+    private void RefreshPlot_Click(object? sender, RoutedEventArgs e)
+    {
+        RefreshPlot();
     }
 }

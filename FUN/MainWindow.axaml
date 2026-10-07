@@ -29,7 +29,7 @@
 				<!-- Effet au survol des boutons -->
 				<Style Selector="Button:pointerover /template/ ContentPresenter">
 					<Setter Property="Background" Value="#45475a"/>
-					<Setter Property="TextElement.Foreground" Value="#ffffff"/>
+					<Setter Property="TextElement.Foreground" Value="#cdd6f4"/>
 				</Style>
 			</StackPanel.Styles>
 
@@ -42,9 +42,14 @@
 			<Border Height="1" Background="#313244" Margin="12,8"/>
 			<!-- Boutons d'import -->
 			<Button Content="Importer Fichier (CSV)" HorizontalAlignment="Stretch" Margin="12,0" Click="ImportFile_Click"/>
+			
 
 
 			<Border Height="1" Background="#313244" Margin="12,8"/>
+			
+			<!-- Boutons de refresh -->
+			<Button Content="Actualiser le graph" Background="#353284" HorizontalAlignment="Stretch" Margin="12,0" Click="RefreshPlot_Click"/>
+
 
 			<!-- bouton dans le menu -->
 			<StackPanel Orientation="Horizontal" Margin="12,0" Spacing="8">
