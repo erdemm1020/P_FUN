@@ -33,12 +33,12 @@ public partial class MainWindow : Window
     private void ReloadData()
     {
         string importsDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "FichierIMport");
-        var allData = new List<Weather>();
+        List<Weather> allData = new List<Weather>();
 
         if (Directory.Exists(importsDir))
         {
             // Synchronisation des fichiers sources connus s'ils ont été modifiés
-            foreach (var f in _importedSourceFiles)
+            foreach (KeyValuePair<string, string> f in _importedSourceFiles)
             {
                 string sourcePath = f.Key;
                 string destPath = f.Value;
@@ -60,15 +60,16 @@ public partial class MainWindow : Window
             }
 
             // parcours de chaque fichier dans le dossier import ordonné par date d'écriture
-            var files = Directory.GetFiles(importsDir)
-                .OrderBy(File.GetLastWriteTimeUtc);
+            string[] files = Directory.GetFiles(importsDir)
+                .OrderBy(File.GetLastWriteTimeUtc)
+                .ToArray();
 
-            foreach (var file in files)
+            foreach (string file in files)
             {
                 try
                 {
                     // détermination du parser en fonction de l'extension 
-                    var parsed = Path.GetExtension(file).ToLowerInvariant() switch
+                    IEnumerable<Weather> parsed = Path.GetExtension(file).ToLowerInvariant() switch
                     {
                         ".csv" => DataSerie<Weather>.FromCsv(file, Parser.ParseWeather).Values,
                         _ => Enumerable.Empty<Weather>()
@@ -84,7 +85,7 @@ public partial class MainWindow : Window
         }
 
         // tri des données pour enlever les doublons 
-        var combinedValues = allData
+        List<Weather> combinedValues = allData
             .GroupBy(w => new { w.DateData, w.CityName })
             .Select(g => g.Last())
             .OrderBy(w => w.DateData)
@@ -110,7 +111,7 @@ public partial class MainWindow : Window
     private void RefreshPlot()
     {
         // Sauvegarder l'état des cases à cocher existantes pour conserver la sélection de l'utilisateur
-        var previousCheckedStates = CityCheckBoxContainer.Children
+        Dictionary<string, bool> previousCheckedStates = CityCheckBoxContainer.Children
             .OfType<CheckBox>()
             .ToDictionary(cb => cb.Content?.ToString() ?? "", cb => cb.IsChecked == true);
 
