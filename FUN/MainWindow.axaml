@@ -47,6 +47,23 @@
 
 
 			<Border Height="1" Background="#313244" Margin="12,8"/>
+			
+			<StackPanel Orientation="Vertical" Spacing="10">
+				<TextBox x:Name="CityInputTextBox" 
+				         Watermark="Nom de la ville" 
+				         Width="180" />
+    
+				<DatePicker x:Name="DateInputPicker" />
+
+				<TextBox x:Name="TemperatureInputTextBox" 
+				         Watermark="Température (°C)" 
+				         Width="130" />
+
+				<Button Content="Ajouter à la série" 
+				        Click="AddDataButton_Click" 
+				        Background="#313244" 
+				        Foreground="White" />
+			</StackPanel>
 
 
 			<!-- bouton dans le menu -->

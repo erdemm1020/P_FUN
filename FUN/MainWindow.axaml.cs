@@ -20,11 +20,11 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
-        
+
         ReloadData();
 
         // interaction dans le graphiuqe
-        MyPlot.IsHitTestVisible = true; 
+        MyPlot.IsHitTestVisible = true;
     }
 
     /// <summary>
@@ -92,9 +92,9 @@ public partial class MainWindow : Window
 
         // création de la serie de données à partir des valeurs sans doublons
         _series = DataSerie<Weather>.From(combinedValues);
-        
+
         Console.WriteLine($"Données rechargées. Nombre d'éléments : {_series.Count}");
-        
+
         RefreshPlot();
     }
 
@@ -102,7 +102,6 @@ public partial class MainWindow : Window
     {
         ReloadData();
     }
-
 
 
     /// <summary>
@@ -153,7 +152,7 @@ public partial class MainWindow : Window
             };
 
             //
-            checkBox.IsCheckedChanged += (_, _) => 
+            checkBox.IsCheckedChanged += (_, _) =>
             {
                 scatter.IsVisible = checkBox.IsChecked == true;
                 MyPlot.Refresh();
@@ -164,7 +163,7 @@ public partial class MainWindow : Window
 
         CityCheckBoxContainer.Children.AddRange(checkBoxes);
         MyPlot.Plot.Axes.DateTimeTicksBottom();
-        MyPlot.Plot.ShowLegend(); 
+        MyPlot.Plot.ShowLegend();
         MyPlot.Refresh();
     }
 
@@ -179,7 +178,7 @@ public partial class MainWindow : Window
             AllowMultiple = true
         });
 
-        if (files is not { Count: > 0 }) return; 
+        if (files is not { Count: > 0 }) return;
 
         string importsDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "FichierIMport");
         Directory.CreateDirectory(importsDir);
@@ -228,7 +227,8 @@ public partial class MainWindow : Window
             case "CSV":
                 string csvPath = Path.Combine(exportsDir, $"{timestamp}_donnees_export.csv");
                 var csvLines = _series.Values
-                    .Select(w => $"{w.DateData:yyyy-MM-dd HH:mm:ss},{w.CityName},{w.Temperature.ToString(CultureInfo.InvariantCulture)}")
+                    .Select(w =>
+                        $"{w.DateData:yyyy-MM-dd HH:mm:ss},{w.CityName},{w.Temperature.ToString(CultureInfo.InvariantCulture)}")
                     .Prepend("Date,Ville,Temperature");
 
                 File.WriteAllLines(csvPath, csvLines);
@@ -236,6 +236,7 @@ public partial class MainWindow : Window
                 break;
         }
     }
+
     /// <summary>
     /// Zoom avant dans le graphique 
     /// </summary>
@@ -261,5 +262,51 @@ public partial class MainWindow : Window
     {
         MyPlot.Plot.Axes.AutoScale();
         MyPlot.Refresh();
+    }
+
+    /// <summary>
+    /// Ajoute manuellement de données
+    /// </summary>
+    private void AddDataButton_Click(object? sender, RoutedEventArgs e)
+    {
+        string cityName = CityInputTextBox.Text?.Trim() ?? "";
+        if (string.IsNullOrWhiteSpace(cityName))
+        {
+            Console.WriteLine("Erreur : Le nom de la ville est invalide");
+            return;
+        }
+
+        if (!double.TryParse(TemperatureInputTextBox.Text, NumberStyles.Any, CultureInfo.InvariantCulture, out double temperature))
+        {
+            Console.WriteLine("Erreur : La température doit être un nombre valide.");
+            return;
+        }
+
+        DateTime selectedDate = DateInputPicker.SelectedDate?.DateTime ?? DateTime.Now;
+
+        string importsDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "FichierIMport");
+        Directory.CreateDirectory(importsDir);
+
+        string timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
+        string manualFilePath = Path.Combine(importsDir, $"{timestamp}_manuelle.csv");
+
+        string csvHeader = "Date,Ville,Temperature";
+        string csvLine =
+            $"{selectedDate:yyyy-MM-dd HH:mm:ss},{cityName},{temperature.ToString(CultureInfo.InvariantCulture)}";
+
+        try
+        {
+            File.WriteAllLines(manualFilePath, new[] { csvHeader, csvLine });
+            Console.WriteLine($"Nouvelle donnée ajoutée dans : {manualFilePath}");
+
+            CityInputTextBox.Text = string.Empty;
+            TemperatureInputTextBox.Text = string.Empty;
+
+            ReloadData();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Erreur lors de l'enregistrement de la donnée : {ex.Message}");
+        }
     }
 }
