@@ -236,10 +236,6 @@ public partial class MainWindow : Window
                 break;
         }
     }
-    private void RefreshPlot_Click(object? sender, RoutedEventArgs e)
-    {
-        RefreshPlot();
-    }
     /// <summary>
     /// Zoom avant dans le graphique 
     /// </summary>
