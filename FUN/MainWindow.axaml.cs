@@ -240,4 +240,30 @@ public partial class MainWindow : Window
     {
         RefreshPlot();
     }
+    /// <summary>
+    /// Zoom avant dans le graphique 
+    /// </summary>
+    private void ZoomInButton_Click(object? sender, RoutedEventArgs e)
+    {
+        MyPlot.Plot.Axes.Zoom(1.25, 1.25);
+        MyPlot.Refresh();
+    }
+
+    /// <summary>
+    /// Zoom arrière dans le graphique
+    /// </summary>
+    private void ZoomOutButton_Click(object? sender, RoutedEventArgs e)
+    {
+        MyPlot.Plot.Axes.Zoom(0.8, 0.8);
+        MyPlot.Refresh();
+    }
+
+    /// <summary>
+    /// Re adapte la vue pour afficher l'ensemble des données
+    /// </summary>
+    private void ResetViewButton_Click(object? sender, RoutedEventArgs e)
+    {
+        MyPlot.Plot.Axes.AutoScale();
+        MyPlot.Refresh();
+    }
 }

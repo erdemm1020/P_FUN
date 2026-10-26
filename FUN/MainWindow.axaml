@@ -57,6 +57,15 @@
 				</ComboBox>
 				<Button Content="Exporter" Click="ExportButton_Click"/>
 			</StackPanel>
+			
+			
+			<!-- Boutons de zoom -->
+			<StackPanel Orientation="Vertical" Spacing="8" Margin="0,5">
+				<Button Content="Zoom +" Click="ZoomInButton_Click" />
+				<Button Content="Zoom -" Click="ZoomOutButton_Click" />
+				<Button Content="Recadrer la vue" Click="ResetViewButton_Click" />
+			</StackPanel>
+			
 		</StackPanel>
 
 	</Grid>
