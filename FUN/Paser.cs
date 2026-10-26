@@ -16,10 +16,8 @@ public class Parser
         DateTime date = DateTime.Parse(cols[0].Trim(), CultureInfo.InvariantCulture);
         string cityName = cols[1].Trim();
         double temperature = double.Parse(cols[2].Trim(), CultureInfo.InvariantCulture);
-        double degres = cols.Length > 3 && !string.IsNullOrWhiteSpace(cols[3])
-            ? double.Parse(cols[3].Trim(), CultureInfo.InvariantCulture)
-            : 0;
 
-        return new Weather(date, cityName, temperature, degres);
+
+        return new Weather(date, cityName, temperature);
     }
 }

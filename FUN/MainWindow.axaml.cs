@@ -228,8 +228,8 @@ public partial class MainWindow : Window
             case "CSV":
                 string csvPath = Path.Combine(exportsDir, $"{timestamp}_donnees_export.csv");
                 var csvLines = _series.Values
-                    .Select(w => $"{w.DateData:yyyy-MM-dd HH:mm:ss},{w.CityName},{w.Temperature.ToString(CultureInfo.InvariantCulture)},{w.Degres.ToString(CultureInfo.InvariantCulture)}")
-                    .Prepend("Date,Ville,Temperature,Degres");
+                    .Select(w => $"{w.DateData:yyyy-MM-dd HH:mm:ss},{w.CityName},{w.Temperature.ToString(CultureInfo.InvariantCulture)}")
+                    .Prepend("Date,Ville,Temperature");
 
                 File.WriteAllLines(csvPath, csvLines);
                 Console.WriteLine($"Export CSV : {csvPath}");
