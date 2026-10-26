@@ -14,19 +14,56 @@ namespace FUN;
 
 public partial class MainWindow : Window
 {
-    private DataSerie<Weather> _series;
+    private DataSerie<Weather> _series = DataSerie<Weather>.From(Enumerable.Empty<Weather>());
+    private Dictionary<string, string> _importedSourceFiles = new();
 
     public MainWindow()
     {
         InitializeComponent();
         
+        ReloadData();
+
+        // interaction dans le graphiuqe
+        MyPlot.IsHitTestVisible = true; 
+    }
+
+    /// <summary>
+    /// Recharge les données depuis le fichier et mets a jour toute l'application
+    /// </summary>
+    private void ReloadData()
+    {
+        string importsDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "FichierIMport");
         var allData = new List<Weather>();
 
-        string importsDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "FichierIMport");
         if (Directory.Exists(importsDir))
         {
-            // parcours de chaque fichier qui se trouve dans le dossier import
-            foreach (var file in Directory.GetFiles(importsDir))
+            // Synchronisation des fichiers sources connus s'ils ont été modifiés
+            foreach (var f in _importedSourceFiles)
+            {
+                string sourcePath = f.Key;
+                string destPath = f.Value;
+                try
+                {
+                    if (File.Exists(sourcePath) && File.Exists(destPath))
+                    {
+                        if (File.GetLastWriteTimeUtc(sourcePath) > File.GetLastWriteTimeUtc(destPath))
+                        {
+                            File.Copy(sourcePath, destPath, true);
+                            Console.WriteLine($"Fichier source synchronisé : {sourcePath}");
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Erreur de synchronisation ({sourcePath}) : {ex.Message}");
+                }
+            }
+
+            // parcours de chaque fichier dans le dossier import ordonné par date d'écriture
+            var files = Directory.GetFiles(importsDir)
+                .OrderBy(File.GetLastWriteTimeUtc);
+
+            foreach (var file in files)
             {
                 try
                 {
@@ -46,21 +83,24 @@ public partial class MainWindow : Window
             }
         }
 
-        // tri des données pour enelver les doublons
+        // tri des données pour enlever les doublons 
         var combinedValues = allData
             .GroupBy(w => new { w.DateData, w.CityName })
-            .Select(g => g.First())
-            .OrderBy(w => w.DateData);
+            .Select(g => g.Last())
+            .OrderBy(w => w.DateData)
+            .ToList();
 
-        // céraition de la serie de données à partir des valeurs sans doublons
+        // création de la serie de données à partir des valeurs sans doublons
         _series = DataSerie<Weather>.From(combinedValues);
         
-        Console.WriteLine($"Nombre d'éléments : {_series.Count}");
+        Console.WriteLine($"Données rechargées. Nombre d'éléments : {_series.Count}");
         
         RefreshPlot();
+    }
 
-        // interaction dans le graphiuqe
-        MyPlot.IsHitTestVisible = true; 
+    private void RefreshButton_Click(object? sender, RoutedEventArgs e)
+    {
+        ReloadData();
     }
 
     /// <summary>
@@ -68,9 +108,20 @@ public partial class MainWindow : Window
     /// </summary>
     private void RefreshPlot()
     {
+        // Sauvegarder l'état des cases à cocher existantes pour conserver la sélection de l'utilisateur
+        var previousCheckedStates = CityCheckBoxContainer.Children
+            .OfType<CheckBox>()
+            .ToDictionary(cb => cb.Content?.ToString() ?? "", cb => cb.IsChecked == true);
+
         // nettoyage de l'ancien affichage
         MyPlot.Plot.Clear();
         CityCheckBoxContainer.Children.Clear();
+
+        if (_series == null || !_series.Values.Any())
+        {
+            MyPlot.Refresh();
+            return;
+        }
 
         // regroupement des données par villes
         var cityPlotsData = _series.Values
@@ -79,7 +130,8 @@ public partial class MainWindow : Window
                 CityName: group.Key,
                 Dates: group.Select(dp => dp.DateData.ToOADate()).ToArray(),
                 Temps: group.Select(dp => dp.Temperature).ToArray()
-            ));
+            ))
+            .ToList();
 
         // génération des courbes et de leurs checkBoxes
         var checkBoxes = cityPlotsData.Select(data =>
@@ -87,10 +139,13 @@ public partial class MainWindow : Window
             var scatter = MyPlot.Plot.Add.Scatter(data.Dates, data.Temps);
             scatter.LegendText = data.CityName;
 
+            bool isChecked = !previousCheckedStates.TryGetValue(data.CityName, out bool wasChecked) || wasChecked;
+            scatter.IsVisible = isChecked;
+
             var checkBox = new CheckBox
             {
                 Content = data.CityName,
-                IsChecked = true,
+                IsChecked = isChecked,
                 Foreground = Avalonia.Media.Brush.Parse("#cdd6f4"),
                 Margin = new Thickness(12, 0)
             };
@@ -127,8 +182,6 @@ public partial class MainWindow : Window
         string importsDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "FichierIMport");
         Directory.CreateDirectory(importsDir);
 
-        var allNewWeathers = new List<Weather>();
-
         foreach (var file in files)
         {
             try
@@ -140,15 +193,8 @@ public partial class MainWindow : Window
                 string destPath = Path.Combine(importsDir, $"{timestamp}_{Path.GetFileName(sourcePath)}");
 
                 File.Copy(sourcePath, destPath, true);
-                Console.WriteLine($"Fichier copiee : {destPath}");
-
-                var parsedWeathers = Path.GetExtension(destPath).ToLowerInvariant() switch
-                {
-                    ".csv" => DataSerie<Weather>.FromCsv(destPath, Parser.ParseWeather).Values,
-                    _ => Enumerable.Empty<Weather>()
-                };
-
-                allNewWeathers.AddRange(parsedWeathers);
+                _importedSourceFiles[sourcePath] = destPath;
+                Console.WriteLine($"Fichier copié : {destPath}");
             }
             catch (Exception ex)
             {
@@ -156,18 +202,7 @@ public partial class MainWindow : Window
             }
         }
 
-        if (allNewWeathers.Any())
-        {
-            var combinedValues = _series.Values
-                .Concat(allNewWeathers)
-                .GroupBy(w => new { w.DateData, w.CityName })
-                .Select(g => g.First())
-                .OrderBy(w => w.DateData);
-
-            _series = DataSerie<Weather>.From(combinedValues);
-            RefreshPlot();
-            Console.WriteLine($"Importatoion terminée. Total : {_series.Count}");
-        }
+        ReloadData();
     }
 
     private void ExportButton_Click(object? sender, RoutedEventArgs e)

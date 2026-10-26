@@ -24,6 +24,7 @@ namespace DataSeries
                 List<string> content = File.ReadAllLines(filename).ToList();
                 foreach (string line in content.Skip(1))
                 {
+                    if (string.IsNullOrWhiteSpace(line)) continue;
                     string[] cols = line.Split(',');
                     data.Add(parser(cols));
                 }
