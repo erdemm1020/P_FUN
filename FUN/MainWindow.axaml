@@ -29,7 +29,7 @@
 				<!-- Effet au survol des boutons -->
 				<Style Selector="Button:pointerover /template/ ContentPresenter">
 					<Setter Property="Background" Value="#45475a"/>
-					<Setter Property="TextElement.Foreground" Value="#ffffff"/>
+					<Setter Property="TextElement.Foreground" Value="#cdd6f4"/>
 				</Style>
 			</StackPanel.Styles>
 
@@ -45,7 +45,9 @@
 			<Button Content="Actualiser" HorizontalAlignment="Stretch" Margin="12,0" Click="RefreshButton_Click"/>
 
 
+
 			<Border Height="1" Background="#313244" Margin="12,8"/>
+
 
 			<!-- bouton dans le menu -->
 			<StackPanel Orientation="Horizontal" Margin="12,0" Spacing="8">
