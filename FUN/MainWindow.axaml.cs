@@ -168,44 +168,56 @@ public partial class MainWindow : Window
         MyPlot.Plot.ShowLegend();
         MyPlot.Refresh();
     }
-
     private async void ImportFile_Click(object? sender, RoutedEventArgs e)
     {
         var topLevel = TopLevel.GetTopLevel(this);
         if (topLevel == null) return;
 
+        // ouvre la fenêtre de sélection de fichiers
         var files = await topLevel.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
         {
-            Title = "Selectionner un fichier",
+            Title = "Sélectionner un fichier",
             AllowMultiple = true
         });
 
-        if (files is not { Count: > 0 }) return;
+        // aucun fichier choisi
+        if (files.Count == 0) return;
 
+        // crée le dossier d'import s'il n'existe pas
         string importsDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "FichierIMport");
         Directory.CreateDirectory(importsDir);
 
-        foreach (var file in files)
-        {
-            try
-            {
-                string sourcePath = file.Path.LocalPath;
-                if (string.IsNullOrEmpty(sourcePath) || !File.Exists(sourcePath)) continue;
-
-                string timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
-                string destPath = Path.Combine(importsDir, $"{timestamp}_{Path.GetFileName(sourcePath)}");
-
-                File.Copy(sourcePath, destPath, true);
-                _importedSourceFiles[sourcePath] = destPath;
-                Console.WriteLine($"Fichier copié : {destPath}");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Erreur ({file.Name}) : {ex.Message}");
-            }
-        }
+        // récupère les chemins des fichiers puis copie chacun dans le dossier d'import
+        files
+            .Select(file => file.Path.LocalPath)
+            .ToList()
+            .ForEach(path => CopyToImports(path, importsDir));
 
         ReloadData();
+    }
+
+    /// <summary>
+    /// Copie un fichier dans le dossier d'import et garde le lien source et la copie
+    /// </summary>
+    private void CopyToImports(string sourcePath, string importsDir)
+    {
+        try
+        {
+            // ignore les fichiers introuvables
+            if (string.IsNullOrEmpty(sourcePath) || !File.Exists(sourcePath)) return;
+
+            // ajoute la date et l'heure devant le nom pour éviter les doublons
+            string timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
+            string destPath = Path.Combine(importsDir, $"{timestamp}_{Path.GetFileName(sourcePath)}");
+
+            File.Copy(sourcePath, destPath, true);
+            _importedSourceFiles[sourcePath] = destPath;
+            Console.WriteLine($"Fichier copié : {destPath}");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Erreur ({sourcePath}) : {ex.Message}");
+        }
     }
 
     private void ExportButton_Click(object? sender, RoutedEventArgs e)
