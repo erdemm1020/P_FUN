@@ -241,9 +241,16 @@ public partial class MainWindow : Window
 
             case "CSV":
                 string csvPath = Path.Combine(exportsDir, $"{timestamp}_donnees_export.csv");
+                // noms des villes cochées
+                List<string> visibleCities = CityCheckBoxContainer.Children
+                    .OfType<CheckBox>()
+                    .Where(caseVille => caseVille.IsChecked == true)
+                    .Select(caseVille => (string)caseVille.Content!)
+                    .ToList();
+
                 var csvLines = _series.Values
-                    .Select(w =>
-                        $"{w.DateData:yyyy-MM-dd HH:mm:ss},{w.CityName},{w.Temperature.ToString(CultureInfo.InvariantCulture)}")
+                    .Where(w => visibleCities.Contains(w.CityName))
+                    .Select(w => $"{w.DateData:yyyy-MM-dd HH:mm:ss},{w.CityName},{w.Temperature.ToString(CultureInfo.InvariantCulture)}")
                     .Prepend("Date,Ville,Temperature");
 
                 File.WriteAllLines(csvPath, csvLines);
