@@ -41,7 +41,7 @@ public partial class MainWindow : Window
 
             // charge tous les fichiers .csv, du plus ancien au plus récent
             allData = Directory.GetFiles(importsDir)
-                .Where(f => Path.GetExtension(f).Equals(".csv", StringComparison.OrdinalIgnoreCase))
+                .Where(f => f.IsCsv())
                 .OrderBy(File.GetLastWriteTimeUtc)
                 .SelectMany(LoadFile)
                 .ToList();
@@ -250,7 +250,7 @@ public partial class MainWindow : Window
 
                 var csvLines = FIltedData()
                     .Where(w => visibleCities.Contains(w.CityName))
-                    .Select(w => $"{w.DateData:yyyy-MM-dd HH:mm:ss},{w.CityName},{w.Temperature.ToString(CultureInfo.InvariantCulture)}")
+                    .Select(w => w.ToCsvLine())
                     .Prepend("Date,Ville,Temperature");
 
                 File.WriteAllLines(csvPath, csvLines);
