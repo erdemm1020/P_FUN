@@ -57,7 +57,7 @@ public partial class MainWindow : Window
         // crée la série de données sans doublons
         _series = DataSerie<Weather>.From(combinedValues);
 
-        Console.WriteLine($"Données rechargées. Nombre d'éléments : {_series.Count}");
+        ShowMessage($"Données rechargées. Nombre d'éléments : {_series.Count}");
 
         RefreshPlot();
     }
@@ -213,11 +213,11 @@ public partial class MainWindow : Window
 
             File.Copy(sourcePath, destPath, true);
             _importedSourceFiles[sourcePath] = destPath;
-            Console.WriteLine($"Fichier copié : {destPath}");
+            ShowMessage($"Fichier copié : {destPath}");
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Erreur ({sourcePath}) : {ex.Message}");
+            ShowMessage($"Erreur ({sourcePath}) : {ex.Message}");
         }
     }
 
@@ -236,7 +236,7 @@ public partial class MainWindow : Window
             case "PNG":
                 string pngPath = Path.Combine(exportsDir, $"{timestamp}_graphique_export.png");
                 MyPlot.Plot.SavePng(pngPath, (int)MyPlot.Bounds.Width, (int)MyPlot.Bounds.Height);
-                Console.WriteLine($"Export PNG : {pngPath}");
+                ShowMessage($"Export PNG : {pngPath}");
                 break;
 
             case "CSV":
@@ -254,7 +254,7 @@ public partial class MainWindow : Window
                     .Prepend("Date,Ville,Temperature");
 
                 File.WriteAllLines(csvPath, csvLines);
-                Console.WriteLine($"Export CSV : {csvPath}");
+                ShowMessage($"Export CSV : {csvPath}");
                 break;
         }
     }
@@ -294,13 +294,13 @@ public partial class MainWindow : Window
         string cityName = CityInputTextBox.Text?.Trim() ?? "";
         if (string.IsNullOrWhiteSpace(cityName))
         {
-            Console.WriteLine("Erreur : Le nom de la ville est invalide");
+            ShowMessage("Erreur : Le nom de la ville est invalide");
             return;
         }
 
         if (!double.TryParse(TemperatureInputTextBox.Text, NumberStyles.Any, CultureInfo.InvariantCulture, out double temperature))
         {
-            Console.WriteLine("Erreur : La température doit être un nombre valide.");
+            ShowMessage("Erreur : La température doit être un nombre valide.");
             return;
         }
 
@@ -319,7 +319,7 @@ public partial class MainWindow : Window
         try
         {
             File.WriteAllLines(manualFilePath, new[] { csvHeader, csvLine });
-            Console.WriteLine($"Nouvelle donnée ajoutée dans : {manualFilePath}");
+            ShowMessage($"Nouvelle donnée ajoutée dans : {manualFilePath}");
 
             CityInputTextBox.Text = string.Empty;
             TemperatureInputTextBox.Text = string.Empty;
@@ -328,7 +328,7 @@ public partial class MainWindow : Window
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Erreur lors de l'enregistrement de la donnée : {ex.Message}");
+            ShowMessage($"Erreur lors de l'enregistrement de la donnée : {ex.Message}");
         }
     }
     /// <summary>
@@ -362,5 +362,13 @@ public partial class MainWindow : Window
     {
         DateDebutPicker.SelectedDate = null;
         DateFinPicker.SelectedDate = null;
+    }
+    /// <summary>
+    /// Affiche un message dans la fenêtre et dans la console
+    /// </summary>
+    private void ShowMessage(string message)
+    {
+        MessageText.Text = message;
+        Console.WriteLine(message);
     }
 }

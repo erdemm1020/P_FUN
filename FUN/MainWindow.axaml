@@ -88,6 +88,9 @@
 
                     <TextBlock Text="Menu aa" FontSize="18" FontWeight="Bold"/>
 
+					<!-- messages pour l'utilisateur -->
+					<TextBlock x:Name="MessageText" TextWrapping="Wrap" Foreground="#a6e3a1" FontSize="12"/>
+
                     <!-- Checkboxes -->
                     <Border Classes="carte">
                         <StackPanel Spacing="6">
