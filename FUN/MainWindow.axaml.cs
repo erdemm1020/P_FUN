@@ -26,9 +26,8 @@ public partial class MainWindow : Window
         // interaction dans le graphiuqe
         MyPlot.IsHitTestVisible = true;
     }
-
     /// <summary>
-    /// Recharge les données depuis le fichier et mets a jour toute l'application
+    /// Recharge les données depuis les fichiers et met à jour toute l'application
     /// </summary>
     private void ReloadData()
     {
@@ -37,66 +36,68 @@ public partial class MainWindow : Window
 
         if (Directory.Exists(importsDir))
         {
-            // Synchronisation des fichiers sources connus s'ils ont été modifiés
-            foreach (KeyValuePair<string, string> f in _importedSourceFiles)
-            {
-                string sourcePath = f.Key;
-                string destPath = f.Value;
-                try
-                {
-                    if (File.Exists(sourcePath) && File.Exists(destPath))
-                    {
-                        if (File.GetLastWriteTimeUtc(sourcePath) > File.GetLastWriteTimeUtc(destPath))
-                        {
-                            File.Copy(sourcePath, destPath, true);
-                            Console.WriteLine($"Fichier source synchronisé : {sourcePath}");
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Erreur de synchronisation ({sourcePath}) : {ex.Message}");
-                }
-            }
+            // synchronise les fichiers sources qui ont été modifiés
+            _importedSourceFiles.ToList().ForEach(SyncFile);
 
-            // parcours de chaque fichier dans le dossier import ordonné par date d'écriture
-            string[] files = Directory.GetFiles(importsDir)
+            // charge tous les fichiers .csv, du plus ancien au plus récent
+            allData = Directory.GetFiles(importsDir)
+                .Where(f => Path.GetExtension(f).Equals(".csv", StringComparison.OrdinalIgnoreCase))
                 .OrderBy(File.GetLastWriteTimeUtc)
-                .ToArray();
-
-            foreach (string file in files)
-            {
-                try
-                {
-                    // détermination du parser en fonction de l'extension 
-                    IEnumerable<Weather> parsed = Path.GetExtension(file).ToLowerInvariant() switch
-                    {
-                        ".csv" => DataSerie<Weather>.FromCsv(file, Parser.ParseWeather).Values,
-                        _ => Enumerable.Empty<Weather>()
-                    };
-                    // ajout des données dans la liste 
-                    allData.AddRange(parsed);
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Erreur de chargement ({file}) : {ex.Message}");
-                }
-            }
+                .SelectMany(LoadFile)
+                .ToList();
         }
 
-        // tri des données pour enlever les doublons 
+        // enlève les doublons (on garde la donnée la plus récente) et trie par date
         List<Weather> combinedValues = allData
             .GroupBy(w => new { w.DateData, w.CityName })
             .Select(g => g.Last())
             .OrderBy(w => w.DateData)
             .ToList();
 
-        // création de la serie de données à partir des valeurs sans doublons
+        // crée la série de données sans doublons
         _series = DataSerie<Weather>.From(combinedValues);
 
         Console.WriteLine($"Données rechargées. Nombre d'éléments : {_series.Count}");
 
         RefreshPlot();
+    }
+
+    /// <summary>
+    /// Recopie le fichier source dans le dossier d'import s'il est plus récent
+    /// </summary>
+    private static void SyncFile(KeyValuePair<string, string> f)
+    {
+        try
+        {
+            // copie seulement si les deux fichiers existent et que la source est plus récente
+            if (File.Exists(f.Key) && File.Exists(f.Value)
+                && File.GetLastWriteTimeUtc(f.Key) > File.GetLastWriteTimeUtc(f.Value))
+            {
+                File.Copy(f.Key, f.Value, true);
+                Console.WriteLine($"Fichier source synchronisé : {f.Key}");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Erreur de synchronisation ({f.Key}) : {ex.Message}");
+        }
+    }
+
+    /// <summary>
+    /// Lit un fichier CSV et renvoie ses données (vide en cas d'erreur)
+    /// </summary>
+    private static IEnumerable<Weather> LoadFile(string file)
+    {
+        try
+        {
+            // ToList() force la lecture ici, pour que l'erreur soit attrapée par le try
+            return DataSerie<Weather>.FromCsv(file, Parser.ParseWeather).Values.ToList();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Erreur de chargement ({file}) : {ex.Message}");
+            return Enumerable.Empty<Weather>();
+        }
     }
 
     private void RefreshButton_Click(object? sender, RoutedEventArgs e)
