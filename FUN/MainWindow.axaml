@@ -38,6 +38,17 @@
 			<!-- Checkboxes -->
 			<StackPanel x:Name="CityCheckBoxContainer" Spacing="5" Margin="12,0" />
 
+			<!-- filtre par date -->
+			<Border Height="1" Background="#313244" Margin="12,8"/>
+			<StackPanel Margin="12,0" Spacing="6">
+			    <TextBlock Text="Filtrer par date" FontWeight="Bold"/>
+			    <TextBlock Text="Du"/>
+			    <CalendarDatePicker x:Name="DateDebutPicker" HorizontalAlignment="Stretch" SelectedDateChanged="FiltreDate_Changed"/>
+			    <TextBlock Text="Au"/>
+			    <CalendarDatePicker x:Name="DateFinPicker" HorizontalAlignment="Stretch" SelectedDateChanged="FiltreDate_Changed"/>
+			    <Button Content="Enlever le filtre" HorizontalAlignment="Stretch" Click="EnleverFiltre_Click"/>
+			</StackPanel>
+
 			<!-- separator a droite -->
 			<Border Height="1" Background="#313244" Margin="12,8"/>
 			<!-- Boutons d'import et d'actualisation -->

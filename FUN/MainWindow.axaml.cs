@@ -127,7 +127,7 @@ public partial class MainWindow : Window
         }
 
         // regroupement des données par villes
-        var cityPlotsData = _series.Values
+        var cityPlotsData = FIltedData()
             .GroupBy(dp => dp.CityName)
             .Select(group => (
                 CityName: group.Key,
@@ -248,7 +248,7 @@ public partial class MainWindow : Window
                     .Select(caseVille => (string)caseVille.Content!)
                     .ToList();
 
-                var csvLines = _series.Values
+                var csvLines = FIltedData()
                     .Where(w => visibleCities.Contains(w.CityName))
                     .Select(w => $"{w.DateData:yyyy-MM-dd HH:mm:ss},{w.CityName},{w.Temperature.ToString(CultureInfo.InvariantCulture)}")
                     .Prepend("Date,Ville,Temperature");
@@ -330,5 +330,37 @@ public partial class MainWindow : Window
         {
             Console.WriteLine($"Erreur lors de l'enregistrement de la donnée : {ex.Message}");
         }
+    }
+    /// <summary>
+    /// Renvoie les données comprises entre les deux dates du filtre
+    /// </summary>
+    private List<Weather> FIltedData()
+    {
+        // pas de date choisie = pas de limite
+        DateTime debut = DateDebutPicker.SelectedDate ?? DateTime.MinValue;
+        DateTime fin = DateFinPicker.SelectedDate?.AddDays(1) ?? DateTime.MaxValue;
+
+        return _series.Values
+            .Where(w => w.DateData >= debut && w.DateData < fin)
+            .ToList();
+    }
+
+    /// <summary>
+    /// Une date du filtre a changé : on redessine et on recadre
+    /// </summary>
+    private void FiltreDate_Changed(object? sender, SelectionChangedEventArgs e)
+    {
+        RefreshPlot();
+        MyPlot.Plot.Axes.AutoScale();
+        MyPlot.Refresh();
+    }
+
+    /// <summary>
+    /// Enlève les deux dates du filtre
+    /// </summary>
+    private void EnleverFiltre_Click(object? sender, RoutedEventArgs e)
+    {
+        DateDebutPicker.SelectedDate = null;
+        DateFinPicker.SelectedDate = null;
     }
 }
