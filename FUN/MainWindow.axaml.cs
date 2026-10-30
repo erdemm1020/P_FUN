@@ -177,7 +177,8 @@ public partial class MainWindow : Window
         var files = await topLevel.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
         {
             Title = "Sélectionner un fichier",
-            AllowMultiple = true
+            AllowMultiple = true,
+            FileTypeFilter = new[] { new FilePickerFileType("Fichiers CSV") { Patterns = new[] { "*.csv" } } }
         });
 
         // aucun fichier choisi
