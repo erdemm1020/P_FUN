@@ -150,7 +150,7 @@ public partial class MainWindow : Window
                 Content = data.CityName,
                 IsChecked = isChecked,
                 Foreground = Avalonia.Media.Brush.Parse("#cdd6f4"),
-                Margin = new Thickness(12, 0)
+                Margin = new Thickness(0)
             };
 
             //
@@ -304,7 +304,7 @@ public partial class MainWindow : Window
             return;
         }
 
-        DateTime selectedDate = DateInputPicker.SelectedDate?.DateTime ?? DateTime.Now;
+        DateTime selectedDate = DateInputPicker.SelectedDate ?? DateTime.Now;
 
         string importsDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "FichierIMport");
         Directory.CreateDirectory(importsDir);

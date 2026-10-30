@@ -5,96 +5,166 @@
         xmlns:sp="clr-namespace:ScottPlot.Avalonia;assembly=ScottPlot.Avalonia"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="FUN.MainWindow"
-        Title="FUN">
-	<Grid ColumnDefinitions="*, 220">
+        Title="FUN"
+        Width="1200" Height="750" MinWidth="800" MinHeight="500"
+        Background="#1e1e2e">
+    <Grid>
+        <!-- colonnes : graphique, séparateur déplaçable, menu -->
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" MinWidth="400"/>
+            <ColumnDefinition Width="5"/>
+            <ColumnDefinition Width="300" MinWidth="260" MaxWidth="450"/>
+        </Grid.ColumnDefinitions>
 
-		<!-- zone a droite avec le graphique  -->
-		<sp:AvaPlot x:Name="MyPlot" Grid.Column="0" />
+        <!-- zone a droite avec le graphique  -->
+        <Border Grid.Column="0" Margin="12" CornerRadius="10" ClipToBounds="True" Background="White">
+            <sp:AvaPlot x:Name="MyPlot" />
+        </Border>
 
-		<!-- Menu latéral -->
-		<StackPanel Grid.Column="1" Background="#1e1e2e" Margin="0" Spacing="12">
-			<StackPanel.Styles>
-				<Style Selector="TextBlock">
-					<Setter Property="Foreground" Value="#cdd6f4"/>
-				</Style>
-				<Style Selector="CheckBox">
-					<Setter Property="Foreground" Value="#cdd6f4"/>
-				</Style>
-				<!-- Style pour rendre les boutons visibles et lisibles sur fond sombre -->
-				<Style Selector="Button">
-					<Setter Property="Background" Value="#313244"/>
-					<Setter Property="Foreground" Value="#cdd6f4"/>
-					<Setter Property="HorizontalContentAlignment" Value="Center"/>
-				</Style>
-				<!-- Effet au survol des boutons -->
-				<Style Selector="Button:pointerover /template/ ContentPresenter">
-					<Setter Property="Background" Value="#45475a"/>
-					<Setter Property="TextElement.Foreground" Value="#cdd6f4"/>
-				</Style>
-			</StackPanel.Styles>
+        <!-- séparateur pour agrandir ou réduire le menu -->
+        <GridSplitter Grid.Column="1" Background="#313244" ResizeDirection="Columns"/>
 
-			<TextBlock Text="Menu aa" FontSize="16" FontWeight="Bold" Margin="12,16,12,0"/>
+        <!-- Menu latéral -->
+        <!-- thème sombre pour les champs du menu + barre de défilement -->
+        <ThemeVariantScope Grid.Column="2" RequestedThemeVariant="Dark">
+            <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                <StackPanel Background="#1e1e2e" Margin="14" Spacing="14">
+                    <StackPanel.Styles>
+                        <Style Selector="TextBlock">
+                            <Setter Property="Foreground" Value="#cdd6f4"/>
+                        </Style>
+                        <Style Selector="CheckBox">
+                            <Setter Property="Foreground" Value="#cdd6f4"/>
+                        </Style>
+                        <!-- Style pour rendre les boutons visibles et lisibles sur fond sombre -->
+                        <Style Selector="Button">
+                            <Setter Property="Background" Value="#313244"/>
+                            <Setter Property="Foreground" Value="#cdd6f4"/>
+                            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                            <Setter Property="Padding" Value="10,8"/>
+                            <Setter Property="CornerRadius" Value="6"/>
+                        </Style>
+                        <!-- Effet au survol des boutons -->
+                        <Style Selector="Button:pointerover /template/ ContentPresenter">
+                            <Setter Property="Background" Value="#45475a"/>
+                            <Setter Property="TextElement.Foreground" Value="#cdd6f4"/>
+                        </Style>
+                        <!-- effet au clic des boutons -->
+                        <Style Selector="Button:pressed /template/ ContentPresenter">
+                            <Setter Property="Background" Value="#585b70"/>
+                        </Style>
+                        <!-- boutons importants en bleu -->
+                        <Style Selector="Button.principal">
+                            <Setter Property="Background" Value="#89b4fa"/>
+                            <Setter Property="Foreground" Value="#1e1e2e"/>
+                            <Setter Property="FontWeight" Value="SemiBold"/>
+                        </Style>
+                        <Style Selector="Button.principal:pointerover /template/ ContentPresenter">
+                            <Setter Property="Background" Value="#b4befe"/>
+                            <Setter Property="TextElement.Foreground" Value="#1e1e2e"/>
+                        </Style>
+                        <Style Selector="Button.principal:pressed /template/ ContentPresenter">
+                            <Setter Property="Background" Value="#74c7ec"/>
+                        </Style>
+                        <!-- cartes qui regroupent chaque section -->
+                        <Style Selector="Border.carte">
+                            <Setter Property="Background" Value="#181825"/>
+                            <Setter Property="CornerRadius" Value="10"/>
+                            <Setter Property="Padding" Value="14"/>
+                        </Style>
+                        <!-- titres des sections -->
+                        <Style Selector="TextBlock.titre">
+                            <Setter Property="Foreground" Value="#89b4fa"/>
+                            <Setter Property="FontWeight" Value="SemiBold"/>
+                            <Setter Property="Margin" Value="0,0,0,4"/>
+                        </Style>
+                        <!-- petits textes gris -->
+                        <Style Selector="TextBlock.label">
+                            <Setter Property="Foreground" Value="#a6adc8"/>
+                            <Setter Property="FontSize" Value="12"/>
+                        </Style>
+                    </StackPanel.Styles>
 
-			<!-- Checkboxes -->
-			<StackPanel x:Name="CityCheckBoxContainer" Spacing="5" Margin="12,0" />
+                    <TextBlock Text="Menu aa" FontSize="18" FontWeight="Bold"/>
 
-			<!-- filtre par date -->
-			<Border Height="1" Background="#313244" Margin="12,8"/>
-			<StackPanel Margin="12,0" Spacing="6">
-			    <TextBlock Text="Filtrer par date" FontWeight="Bold"/>
-			    <TextBlock Text="Du"/>
-			    <CalendarDatePicker x:Name="DateDebutPicker" HorizontalAlignment="Stretch" SelectedDateChanged="FiltreDate_Changed"/>
-			    <TextBlock Text="Au"/>
-			    <CalendarDatePicker x:Name="DateFinPicker" HorizontalAlignment="Stretch" SelectedDateChanged="FiltreDate_Changed"/>
-			    <Button Content="Enlever le filtre" HorizontalAlignment="Stretch" Click="EnleverFiltre_Click"/>
-			</StackPanel>
+                    <!-- Checkboxes -->
+                    <Border Classes="carte">
+                        <StackPanel Spacing="6">
+                            <TextBlock Classes="titre" Text="Villes affichées"/>
+                            <StackPanel x:Name="CityCheckBoxContainer" Spacing="4" />
+                        </StackPanel>
+                    </Border>
 
-			<!-- separator a droite -->
-			<Border Height="1" Background="#313244" Margin="12,8"/>
-			<!-- Boutons d'import et d'actualisation -->
-			<Button Content="Importer Fichier (CSV)" HorizontalAlignment="Stretch" Margin="12,0" Click="ImportFile_Click"/>
-			<Button Content="Actualiser" HorizontalAlignment="Stretch" Margin="12,0" Click="RefreshButton_Click"/>
+                    <!-- filtre par date -->
+                    <Border Classes="carte">
+                        <StackPanel Spacing="8">
+                            <TextBlock Classes="titre" Text="Filtrer par date"/>
+                            <TextBlock Classes="label" Text="Du"/>
+                            <CalendarDatePicker x:Name="DateDebutPicker" HorizontalAlignment="Stretch" SelectedDateChanged="FiltreDate_Changed"/>
+                            <TextBlock Classes="label" Text="Au"/>
+                            <CalendarDatePicker x:Name="DateFinPicker" HorizontalAlignment="Stretch" SelectedDateChanged="FiltreDate_Changed"/>
+                            <Button Content="Enlever le filtre" Margin="0,4,0,0" Click="EnleverFiltre_Click"/>
+                        </StackPanel>
+                    </Border>
 
+                    <!-- separator a droite -->
+                    <Border Height="1" Background="#313244"/>
+                    <!-- Boutons d'import et d'actualisation -->
+                    <Border Classes="carte">
+                        <StackPanel Spacing="8">
+                            <TextBlock Classes="titre" Text="Fichiers"/>
+                            <Button Classes="principal" Content="Importer Fichier (CSV)" Click="ImportFile_Click"/>
+                            <Button Content="Actualiser" Click="RefreshButton_Click"/>
+                        </StackPanel>
+                    </Border>
 
+                    <Border Height="1" Background="#313244"/>
+                    <!-- ajout manuel d'une valeur -->
+                    <Border Classes="carte">
+                        <StackPanel Orientation="Vertical" Spacing="8">
+                            <TextBlock Classes="titre" Text="Ajouter une valeur"/>
+                            <TextBox x:Name="CityInputTextBox"
+                                     Watermark="Nom de la ville" />
+                            <CalendarDatePicker x:Name="DateInputPicker" HorizontalAlignment="Stretch" Watermark="Date" />
 
-			<Border Height="1" Background="#313244" Margin="12,8"/>
-			
-			<StackPanel Orientation="Vertical" Spacing="10">
-				<TextBox x:Name="CityInputTextBox" 
-				         Watermark="Nom de la ville" 
-				         Width="180" />
-    
-				<DatePicker x:Name="DateInputPicker" />
+                            <TextBox x:Name="TemperatureInputTextBox"
+                                     Watermark="Température (°C)" />
 
-				<TextBox x:Name="TemperatureInputTextBox" 
-				         Watermark="Température (°C)" 
-				         Width="130" />
+                            <Button Classes="principal"
+                                    Content="Ajouter à la série"
+                                    Click="AddDataButton_Click" />
+                        </StackPanel>
+                    </Border>
 
-				<Button Content="Ajouter à la série" 
-				        Click="AddDataButton_Click" 
-				        Background="#313244" 
-				        Foreground="White" />
-			</StackPanel>
+                    <!-- bouton dans le menu -->
+                    <Border Classes="carte">
+                        <StackPanel Spacing="8">
+                            <TextBlock Classes="titre" Text="Exporter"/>
+                            <Grid ColumnDefinitions="*,8,*">
+                                <ComboBox Grid.Column="0" x:Name="ExportFormatComboBox" SelectedIndex="0" HorizontalAlignment="Stretch">
+                                    <ComboBoxItem>PNG</ComboBoxItem>
+                                    <ComboBoxItem>CSV</ComboBoxItem>
+                                </ComboBox>
+                                <Button Grid.Column="2" Content="Exporter" Click="ExportButton_Click"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+                    <!-- Boutons de zoom -->
+                    <Border Classes="carte">
+                        <StackPanel Orientation="Vertical" Spacing="8">
+                            <TextBlock Classes="titre" Text="Navigation"/>
+                            <!-- zoom + et zoom - côte à côte -->
+                            <Grid ColumnDefinitions="*,8,*">
+                                <Button Grid.Column="0" Content="Zoom +" Click="ZoomInButton_Click" />
+                                <Button Grid.Column="2" Content="Zoom -" Click="ZoomOutButton_Click" />
+                            </Grid>
+                            <Button Content="Recadrer la vue" Click="ResetViewButton_Click" />
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </ScrollViewer>
+        </ThemeVariantScope>
 
-
-			<!-- bouton dans le menu -->
-			<StackPanel Orientation="Horizontal" Margin="12,0" Spacing="8">
-				<ComboBox x:Name="ExportFormatComboBox" SelectedIndex="0" Foreground="#cdd6f4" Background="#313244">
-					<ComboBoxItem Foreground="#cdd6f4">PNG</ComboBoxItem>
-					<ComboBoxItem Foreground="#cdd6f4">CSV</ComboBoxItem>
-				</ComboBox>
-				<Button Content="Exporter" Click="ExportButton_Click"/>
-			</StackPanel>
-			
-			
-			<!-- Boutons de zoom -->
-			<StackPanel Orientation="Vertical" Spacing="8" Margin="0,5">
-				<Button Content="Zoom +" Click="ZoomInButton_Click" />
-				<Button Content="Zoom -" Click="ZoomOutButton_Click" />
-				<Button Content="Recadrer la vue" Click="ResetViewButton_Click" />
-			</StackPanel>
-			
-		</StackPanel>
-
-	</Grid>
+    </Grid>
 </Window>
