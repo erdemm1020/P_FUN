@@ -235,7 +235,7 @@ public partial class MainWindow : Window
         {
             case "PNG":
                 string pngPath = Path.Combine(exportsDir, $"{timestamp}_graphique_export.png");
-                MyPlot.Plot.SavePng(pngPath, 800, 600);
+                MyPlot.Plot.SavePng(pngPath, (int)MyPlot.Bounds.Width, (int)MyPlot.Bounds.Height);
                 Console.WriteLine($"Export PNG : {pngPath}");
                 break;
 
